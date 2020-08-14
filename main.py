@@ -22,7 +22,3 @@ model.load_state_dict(torch.load(PATH))
 
 grad_cam = gradcam.GradCam(model=model, feature_module=model.conv5, \
                     target_layer_names=["conv5"], use_cuda=DEVICE)
-
-#dsafdfdsfafdf
-
-#dsafdfsdf
