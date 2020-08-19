@@ -22,3 +22,22 @@ model.load_state_dict(torch.load(PATH))
 
 grad_cam = gradcam.GradCam(model=model, feature_module=model.conv5, \
                     target_layer_names=["conv5"], use_cuda=DEVICE)
+
+
+test_spectrals, labels = iter(test_loader).next()
+print(model.features_size)
+lable = labels[0]
+input_ = np.array(test_spectrals[0,0,:])
+input_ = np.expand_dims(input_,axis=0)
+input_ = np.expand_dims(input_,axis=0)
+
+input_ = torch.from_numpy(input_).to(DEVICE)
+# target_index = torch.unsqueeze(lable,0)
+# target_index = target_index.to(DEVICE)
+# input_ = input_.requires_grad_(True)
+# print(model._modules.items())
+# print(input_)
+gb_model = gradcam.GuidedBackpropReLUModel(model=model, use_cuda=DEVICE)
+gb = gb_model(input_, index=target_index)
+print(gb)
+
