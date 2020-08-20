@@ -31,7 +31,8 @@ class bjkangNet(nn.Module):
         self.conv5 = nn.Conv1d(32, 32, 3, stride = 1)
         self.features_size = self._get_final_flattened_size()
 
-        self.fc1 = nn.Linear(self.features_size, n_classes)
+        self.fc1 = nn.Linear(self.features_size, 100)
+        self.fc2 = nn.Linear(100, n_classes)
 
     def forward(self, x):
         x = F.relu(self.conv1(x))
@@ -42,6 +43,7 @@ class bjkangNet(nn.Module):
 
         x = x.view(-1,self.features_size)
         x = self.fc1(x)
+        X = self.fc2(x)
         return x
 
 def train(model, train_loader, optimizer, epoch,iterator):
