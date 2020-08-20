@@ -88,7 +88,7 @@ if __name__=='__main__':
 
     import load_mat_data
 
-    EPOCHS = 100
+    EPOCHS = 400
     batch_size = 100
     train_sample = 0.7
 

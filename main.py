@@ -32,12 +32,17 @@ input_ = np.expand_dims(input_,axis=0)
 input_ = np.expand_dims(input_,axis=0)
 
 input_ = torch.from_numpy(input_).to(DEVICE)
+intput_np = input_.to("cpu").numpy()
+plt.figure(1)
+plt.plot(np.squeeze(intput_np))
+
+# plt.colorbar()
+
 # target_index = torch.unsqueeze(lable,0)
 # target_index = target_index.to(DEVICE)
 # input_ = input_.requires_grad_(True)
 # print(model._modules.items())
 # print(input_)
-gb_model = gradcam.GuidedBackpropReLUModel(model=model, use_cuda=DEVICE)
-gb = gb_model(input_, index=target_index)
-print(gb)
-
+# gb_model = gradcam.GuidedBackpropReLUModel(model=model, use_cuda=DEVICE)
+# gb = gb_model(input_, index=target_index)
+# print(gb)
