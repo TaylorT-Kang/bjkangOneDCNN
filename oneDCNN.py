@@ -3,6 +3,8 @@ import torch.nn.functional as F
 import torch
 import numpy as np
 import torch.optim as optim
+import matplotlib.pyplot as plt
+import time
 
 class bjkangNet(nn.Module):
 
@@ -42,8 +44,9 @@ class bjkangNet(nn.Module):
         x = self.fc1(x)
         return x
 
-def train(model, train_loader, optimizer, epoch):
+def train(model, train_loader, optimizer, epoch,iterator):
     model.train()
+
     for batch_idx, (data, target) in enumerate(train_loader):
         data, target = data.to(DEVICE), target.to(DEVICE)
         optimizer.zero_grad()
@@ -56,10 +59,11 @@ def train(model, train_loader, optimizer, epoch):
             print('Train Epoch: {} [{}/{} ({:.0f}%)]\tLoss: {:.6f}'.format(
                 epoch, batch_idx * len(data), len(train_loader.dataset),
                 100. * batch_idx / len(train_loader), loss.item()))
-    return
+
+    return iterator
 
 
-def evaluate(model, test_loader):
+def evaluate(model, test_loader,epoch):
     model.eval()
     test_loss = 0
     correct = 0
@@ -90,16 +94,19 @@ if __name__=='__main__':
 
     EPOCHS = 400
     batch_size = 100
-    train_sample = 0.7
-
-    input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, train_sample)
+    test_sample = 0.7
+    learning_rate = 0.001
+    input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
     print(model)
-    optimizer = optim.SGD(model.parameters(), lr=0.001, momentum=0.9)
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+    iterator = 0
+    plt.ion()
+
 
     for epoch in range(1, EPOCHS + 1):
-        train(model, train_loader, optimizer, epoch)
-        test_loss, test_accuracy = evaluate(model, test_loader)
+        iterator = train(model, train_loader, optimizer, epoch, iterator)
+        test_loss, test_accuracy = evaluate(model, test_loader,epoch)
         if epoch == 90 : 
             break_point = 0
         

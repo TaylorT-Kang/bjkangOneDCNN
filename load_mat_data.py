@@ -12,8 +12,10 @@ class CustomDataset(Dataset):
         self.x = x_tensor
         self.y = y_tensor
 
-    def __getitem__(self, index):
-        return (self.x[index], self.y[index])
+    def __getitem__(self, idx):
+        x = torch.FloatTensor(self.x[idx])
+        y = torch.from_numpy(self.y[idx]).int64()
+        return x, y
 
     def __len__(self):
         return len(self.x)
@@ -49,14 +51,17 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
                 target.append(HSI_gt[i,j])
     # for key in hsi_data:
 
-    x_train_tensor = torch.from_numpy(np.array(hsi_data,dtype=np.float)).float()
-    y_train_tensor = torch.from_numpy(np.array(target,dtype=np.long)).long()
+    # X = np.array(hsi_data, dtype=np.float)
+    # y = np.array(target, dtype=np.int64)
 
-    X_train, X_test, y_train, y_test = train_test_split(x_train_tensor,y_train_tensor,test_size = test_sample, stratify=y_train_tensor)
-    np.unique(y_train, return_counts=True)
-    np.unique(y_test, return_counts=True)
-    train_dataset = CustomDataset(X_train,y_train)
-    test_dataset = CustomDataset(X_test, y_test)
+    X = torch.from_numpy(np.array(hsi_data,dtype=np.float)).float()
+    y = torch.from_numpy(np.array(target,dtype=np.long)).long()
+
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = test_sample, stratify=y, random_state=42)
+    # np.unique(y_train, return_counts=True)
+    # np.unique(y_test, return_counts=True)
+    train_dataset = TensorDataset(X_train, y_train)
+    test_dataset = TensorDataset(X_test, y_test)
     train_loader = DataLoader(dataset=train_dataset, batch_size=b_size, shuffle=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=b_size, shuffle=True)
 
