@@ -116,5 +116,6 @@ if __name__=='__main__':
             epoch, test_loss, test_accuracy))
 
 
+    
     PATH = './bjkangNet.pth'
     torch.save(model.state_dict(), PATH)

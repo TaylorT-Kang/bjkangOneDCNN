@@ -6,7 +6,7 @@ from sklearn.model_selection import train_test_split
 
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset, TensorDataset
-
+import hyperNomalize
 class CustomDataset(Dataset):
     def __init__(self, x_tensor, y_tensor):
         self.x = x_tensor
@@ -28,6 +28,8 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     mat_file = io.loadmat(gt_path)
     key_list = list(mat_file.keys())
     HSI_gt = mat_file[key_list[3]]
+    HSI_data = np.array(HSI_data, dtype=np.float)
+    HSI_data = hyperNomalize.hyperNormalize(HSI_data)
 
     h, w, input_channels = HSI_data.shape
     n_classes = HSI_gt.max()
@@ -58,8 +60,6 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     y = torch.from_numpy(np.array(target,dtype=np.long)).long()
 
     X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = test_sample, stratify=y, random_state=42)
-    # np.unique(y_train, return_counts=True)
-    # np.unique(y_test, return_counts=True)
     train_dataset = TensorDataset(X_train, y_train)
     test_dataset = TensorDataset(X_test, y_test)
     train_loader = DataLoader(dataset=train_dataset, batch_size=b_size, shuffle=True)
