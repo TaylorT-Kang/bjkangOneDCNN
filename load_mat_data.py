@@ -59,7 +59,7 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     X = torch.from_numpy(np.array(hsi_data,dtype=np.float)).float()
     y = torch.from_numpy(np.array(target,dtype=np.long)).long()
 
-    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = test_sample, stratify=y, random_state=42)
+    X_train, X_test, y_train, y_test = train_test_split(X,y,test_size = test_sample, stratify=y)
     train_dataset = TensorDataset(X_train, y_train)
     test_dataset = TensorDataset(X_test, y_test)
     train_loader = DataLoader(dataset=train_dataset, batch_size=b_size, shuffle=True)

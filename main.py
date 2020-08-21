@@ -9,9 +9,9 @@ import oneDCNN
 import load_mat_data
 
 PATH = './bjkangNet.pth'
-batch_size = 100
-train_sample = 0.7
-input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, train_sample)
+batch_size = 1
+test_sample = 0.7
+input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(DEVICE)
@@ -25,18 +25,23 @@ grad_cam = gradcam.GradCam(model=model, feature_module=model.conv5, \
 
 
 test_spectrals, labels = iter(test_loader).next()
-print(model.features_size)
-lable = labels[0]
-input_ = np.array(test_spectrals[0,0,:])
-input_ = np.expand_dims(input_,axis=0)
-input_ = np.expand_dims(input_,axis=0)
+label = labels[0]
+input_ = test_spectrals.requires_grad_(True)
 
-input_ = torch.from_numpy(input_).to(DEVICE)
-intput_np = input_.to("cpu").numpy()
-plt.figure(1)
-plt.plot(np.squeeze(intput_np))
+# intput_np = input_.to("cpu").numpy()
+gb_model = gradcam.GuidedBackpropReLUModel(model=model, use_cuda=DEVICE)
+target_index = label
+print("target : " , label)
+# target_index = torch.unsqueeze(label,0)
+target_index = target_index.to(DEVICE)
+gb = gb_model(input_, index=target_index)
+# print(gb)
+plt.figure(1, figsize=(5,5))
+plt.imshow(gb)
+plt.colorbar()
+plt.show()
+plt.close()
 
-# plt.colorbar()
 
 # target_index = torch.unsqueeze(lable,0)
 # target_index = target_index.to(DEVICE)

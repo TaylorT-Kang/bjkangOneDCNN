@@ -94,9 +94,9 @@ if __name__=='__main__':
 
     import load_mat_data
 
-    EPOCHS = 400
+    EPOCHS = 100
     batch_size = 100
-    test_sample = 0.3
+    test_sample = 0.7
     learning_rate = 0.001
     input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
@@ -116,6 +116,6 @@ if __name__=='__main__':
             epoch, test_loss, test_accuracy))
 
 
-    
+
     PATH = './bjkangNet.pth'
     torch.save(model.state_dict(), PATH)

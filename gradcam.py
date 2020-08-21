@@ -198,7 +198,7 @@ class GuidedBackpropReLUModel:
         one_hot.backward(retain_graph=True)
 
         output = input.grad.cpu().data.numpy()
-        output = output[0, :, :, :]
+        output = output[0, :, :]
 
         return output
 
