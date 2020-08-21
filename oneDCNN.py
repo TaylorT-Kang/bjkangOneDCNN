@@ -96,7 +96,7 @@ if __name__=='__main__':
 
     EPOCHS = 400
     batch_size = 100
-    test_sample = 0.7
+    test_sample = 0.3
     learning_rate = 0.001
     input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
