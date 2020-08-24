@@ -38,6 +38,7 @@ class ModelOutputs():
         self.model = model
         self.feature_module = feature_module
         self.feature_extractor = FeatureExtractor(self.feature_module, target_layers)
+        self.features_size = model.features_size
 
     def get_gradients(self):
         return self.feature_extractor.gradients
@@ -47,9 +48,9 @@ class ModelOutputs():
         for name, module in self.model._modules.items():
             if module == self.feature_module:
                 target_activations, x = self.feature_extractor(x)
-            elif "avgpool" in name.lower():
+            elif "fc1" in name.lower():
+                x = x.view(-1,self.features_size)
                 x = module(x)
-                x = x.view(x.size(0),-1)
             else:
                 x = module(x)
         
