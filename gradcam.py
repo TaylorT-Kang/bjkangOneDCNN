@@ -37,19 +37,27 @@ class ModelOutputs():
     def __init__(self, model, feature_module, target_layers):
         self.model = model
         self.feature_module = feature_module
-        self.feature_extractor = FeatureExtractor(self.feature_module, target_layers)
-        self.features_size = model.features_size
+        # self.feature_extractor = FeatureExtractor(self.feature_module, target_layers)
+        self.feature_size = model.features_size
+        self.target_layer = target_layers
+        self.gradients = []
+
+    def save_gradient(self, grad):
+        self.gradients.append(grad)
 
     def get_gradients(self):
-        return self.feature_extractor.gradients
+        return self.gradients
 
     def __call__(self, x):
         target_activations = []
+        self.gradients = []
         for name, module in self.model._modules.items():
-            if module == self.feature_module:
-                target_activations, x = self.feature_extractor(x)
+            if name in self.target_layer :
+                x = module(x)
+                x.register_hook(self.save_gradient)
+                target_activations += [x]
             elif "fc1" in name.lower():
-                x = x.view(-1,self.features_size)
+                x = x.view(-1,self.feature_size)
                 x = module(x)
             else:
                 x = module(x)
@@ -121,14 +129,16 @@ class GradCam:
         target = features[-1]
         target = target.cpu().data.numpy()[0, :]
 
-        weights = np.mean(grads_val, axis=(2, 3))[0, :]
+        # weights = np.mean(grads_val, axis=(2, 3))[0, :]
+        weights = np.mean(grads_val, axis=(1, 2))
+
         cam = np.zeros(target.shape[1:], dtype=np.float32)
 
         for i, w in enumerate(weights):
-            cam += w * target[i, :, :]
+            cam += w * target[i, :]
 
         cam = np.maximum(cam, 0)
-        cam = cv2.resize(cam, input.shape[2:])
+        cam = cv2.resize(cam, input.shape[1:])
         cam = cam - np.min(cam)
         cam = cam / np.max(cam)
         return cam
@@ -199,7 +209,7 @@ class GuidedBackpropReLUModel:
         one_hot.backward(retain_graph=True)
 
         output = input.grad.cpu().data.numpy()
-        output = output[0, :, :]
+        output = output[0, :, :, :]
 
         return output
 
@@ -246,7 +256,8 @@ if __name__ == '__main__':
     grad_cam = GradCam(model=model, feature_module=model.layer4, \
                        target_layer_names=["2"], use_cuda=args.use_cuda)
 
-    img = cv2.imread(args.image_path, 1)
+    # img = cv2.imread(args.image_path, 1)
+    img = cv2.imread("./examples/both.png",1)
     img = np.float32(cv2.resize(img, (224, 224))) / 255
     input = preprocess_image(img)
 
