@@ -140,7 +140,9 @@ class GradCam:
         cam = np.maximum(cam, 0)
         cam = cv2.resize(cam, input.shape[1:])
         cam = cam - np.min(cam)
-        cam = cam / np.max(cam)
+        if np.max(cam) != 0 :
+            cam = cam / np.max(cam)
+        cam = np.reshape(cam,(1,-1))
         return cam
 
 
@@ -209,7 +211,7 @@ class GuidedBackpropReLUModel:
         one_hot.backward(retain_graph=True)
 
         output = input.grad.cpu().data.numpy()
-        output = output[0, :, :, :]
+        output = output[0, :, :]
 
         return output
 
