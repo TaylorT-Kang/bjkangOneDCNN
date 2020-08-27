@@ -80,14 +80,4 @@ for key in gb_avg.keys():
 fig = plt.figure(1)
 show_bandSelection(guided_grad_cam, fig)
 
-plt.savefig('band.png',dpi=300)
-# # plt.figure(1)
-# # plt.title('backpro')
-# # plt.imshow(gb_avg[1], aspect='auto')
-# # # plt.colorbar()
-# plt.figure(2)
-# plt.title('gradcam')
-# plt.imshow(grad_cam_avg[1],aspect='auto')
-
-# plt.show()
-# plt.close()
+fig.savefig('band.png',dpi=300)
