@@ -8,6 +8,23 @@ import gradcam
 import oneDCNN
 import load_mat_data
 
+def show_bandSelection(avg_gradcam,fig):
+    number_of_key = len(avg_gradcam)
+    fig = plt.figure(1)
+    cols = 1
+    rows = number_of_key
+    i = 1
+    for key, val in guided_grad_cam.items():
+        ax = fig.add_subplot(rows,cols,i)
+        ax.imshow(val,aspect='auto')
+        ax.set_ylabel(key)
+        i += 1
+
+    plt.show()
+    return
+
+
+
 PATH = './bjkangNet.pth'
 batch_size = 1
 test_sample = 0.3
@@ -60,18 +77,10 @@ guided_grad_cam = {}
 for key in gb_avg.keys():
     guided_grad_cam[key] = gb_avg[key] * grad_cam_avg[key]
 
-number_of_key = len(guided_grad_cam)
 fig = plt.figure(1)
-cols = 1
-rows = number_of_key
-i = 1
-for key, val in guided_grad_cam.items():
-    ax = fig.add_subplot(rows,cols,i)
-    ax.imshow(val,aspect='auto')
-    ax.set_ylabel(key)
-    i += 1
+show_bandSelection(guided_grad_cam, fig)
 
-plt.show()
+plt.savefig('band.png',dpi=300)
 # # plt.figure(1)
 # # plt.title('backpro')
 # # plt.imshow(gb_avg[1], aspect='auto')
