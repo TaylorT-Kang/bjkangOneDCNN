@@ -5,6 +5,7 @@ import oneDCNN
 import load_mat_data
 from scipy import io
 import hyperNomalize
+import matplotlib.pyplot as plt
 
 PATH = './bjkangNet.pth'
 batch_size = 1
@@ -21,7 +22,9 @@ print(model)
 
 HSI_data = np.array(hyperCube, dtype=np.float)
 h, w, _ = HSI_data.shape
+predic_map_include_zeroLabel = np.zeros((h,w))
 predic_map = np.zeros((h,w))
+
 with torch.no_grad():
     for i in range(h):
         for j in range(w):
@@ -31,6 +34,23 @@ with torch.no_grad():
             spectral = torch.from_numpy(spectral).float()
             output = model(spectral)
             a, b = torch.max(output,1)
-            if a > 17:
+            predic_map[i,j] = b
+            if a > 11:
                 b = 0
-            
+            predic_map_include_zeroLabel[i, j] = b   
+         
+            if hyperGt[i,j] == 0:
+                predic_map[i, j] = 0
+
+
+fig = plt.figure(1,figsize=(10,5))
+ax = fig.add_subplot(1,3,1)
+ax.imshow(hyperGt,aspect='auto')
+ax.set_xlabel('Ground Truth')
+ax = fig.add_subplot(1,3,2)
+ax.imshow(predic_map_include_zeroLabel, aspect='auto')
+ax.set_xlabel('predict with zero label')
+ax = fig.add_subplot(1,3,3)
+ax.imshow(predic_map, aspect='auto')
+ax.set_xlabel('predict without zero label')
+plt.show()
