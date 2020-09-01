@@ -35,7 +35,7 @@ with torch.no_grad():
             output = model(spectral)
             a, b = torch.max(output,1)
             predic_map[i,j] = b
-            if a > 30:
+            if a >= 30:
                 b = 0
             predic_map_include_zeroLabel[i, j] = b   
          
@@ -45,15 +45,15 @@ with torch.no_grad():
 
 fig = plt.figure(1,figsize=(10,5))
 ax = fig.add_subplot(1,3,1)
-im = ax.imshow(hyperGt,aspect='auto')
+im = ax.imshow(hyperGt,aspect='auto',cmap='jet')
 fig.colorbar(im)
 ax.set_xlabel('Ground Truth')
 ax = fig.add_subplot(1,3,2)
-im = ax.imshow(predic_map_include_zeroLabel, aspect='auto')
+im = ax.imshow(predic_map_include_zeroLabel, aspect='auto',cmap='jet')
 fig.colorbar(im)
 ax.set_xlabel('predict with zero label')
 ax = fig.add_subplot(1,3,3)
-im = ax.imshow(predic_map, aspect='auto')
+im = ax.imshow(predic_map, aspect='auto',cmap='jet')
 fig.colorbar(im)
 ax.set_xlabel('predict without zero label')
 plt.show()

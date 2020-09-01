@@ -94,11 +94,11 @@ if __name__=='__main__':
 
     import load_mat_data
 
-    EPOCHS = 100
+    EPOCHS = 400
     batch_size = 100
     test_sample = 0.7
     learning_rate = 0.001
-    _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
+    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
     print(model)
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
