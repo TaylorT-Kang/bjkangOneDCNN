@@ -11,3 +11,15 @@ def hyperNormalize(M):
         normalizeM = normalizeM / (maxVal - minVal)
 
     return normalizeM
+
+def spectralNormalize(S):
+    minVal = np.min(S)
+    maxVal = np.max(S)
+
+    normalizeS = S - minVal
+    if maxVal == minVal:
+        normalizeS = np.zeros(S.shape)
+    else:
+        normalizeS = normalizeS / (maxVal - minVal)
+
+    return normalizeS

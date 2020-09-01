@@ -65,4 +65,4 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     train_loader = DataLoader(dataset=train_dataset, batch_size=b_size, shuffle=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=b_size, shuffle=True)
 
-    return input_channels, n_classes + 1 , train_loader, test_loader, 
+    return HSI_data, HSI_gt, input_channels, n_classes + 1 , train_loader, test_loader, 

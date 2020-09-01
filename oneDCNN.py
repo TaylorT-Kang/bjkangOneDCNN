@@ -43,7 +43,7 @@ class bjkangNet(nn.Module):
 
         x = x.view(-1,self.features_size)
         x = self.fc1(x)
-        X = self.fc2(x)
+        x = self.fc2(x)
         return x
 
 def train(model, train_loader, optimizer, epoch,iterator):
@@ -65,7 +65,7 @@ def train(model, train_loader, optimizer, epoch,iterator):
     return iterator
 
 
-def evaluate(model, test_loader,epoch):
+def evaluate(model, test_loader,epoch,DEVICE):
     model.eval()
     test_loss = 0
     correct = 0
@@ -98,17 +98,15 @@ if __name__=='__main__':
     batch_size = 100
     test_sample = 0.7
     learning_rate = 0.001
-    input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
+    _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
     print(model)
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
     iterator = 0
-    plt.ion()
-
 
     for epoch in range(1, EPOCHS + 1):
         iterator = train(model, train_loader, optimizer, epoch, iterator)
-        test_loss, test_accuracy = evaluate(model, test_loader,epoch)
+        test_loss, test_accuracy = evaluate(model, test_loader,epoch,DEVICE)
         if epoch == 90 : 
             break_point = 0
         

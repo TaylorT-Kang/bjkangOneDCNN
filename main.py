@@ -14,7 +14,7 @@ def show_bandSelection(avg_gradcam,fig):
     cols = 1
     rows = number_of_key
     i = 1
-    for key, val in guided_grad_cam.items():
+    for key, val in avg_gradcam.items():
         ax = fig.add_subplot(rows,cols,i)
         ax.imshow(val,aspect='auto')
         ax.set_ylabel(key)
@@ -23,18 +23,20 @@ def show_bandSelection(avg_gradcam,fig):
     plt.show()
     return
 
-
-
 PATH = './bjkangNet.pth'
 batch_size = 1
 test_sample = 0.3
-input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
+_, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
 
 DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
 print(DEVICE)
 
 model = oneDCNN.bjkangNet(input_channels,n_classes)
 model.load_state_dict(torch.load(PATH))
+print(model)
+model.to(DEVICE)
+test_loss, test_accuracy = oneDCNN.evaluate(model, test_loader,0,DEVICE)
+print('Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(test_loss, test_accuracy))
 
 grad_cam = gradcam.GradCam(model=model, feature_module=model, target_layer_names=["conv5"], use_cuda=DEVICE)
 gb_model = gradcam.GuidedBackpropReLUModel(model=model, use_cuda=DEVICE)
@@ -46,7 +48,7 @@ gb_model = gradcam.GuidedBackpropReLUModel(model=model, use_cuda=DEVICE)
 gb_list = {}
 grad_cam_list = {}
 
-dataiter = iter(test_loader)
+dataiter = iter(train_loader)
 for _, data in enumerate(dataiter):
     spectral, label = data[0].to(DEVICE), data[1].to(DEVICE)
     spectral = spectral.requires_grad_(True)
@@ -81,3 +83,9 @@ fig = plt.figure(1)
 show_bandSelection(guided_grad_cam, fig)
 
 fig.savefig('band.png',dpi=300)
+
+import pickle
+
+with open('SelectionBand.pickle','wb') as f:
+    pickle.dump(guided_grad_cam,f)
+
