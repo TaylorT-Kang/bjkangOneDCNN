@@ -8,5 +8,9 @@ bjkangOneDCNN
   + It is to load .mat file, the file consists of W x H x Channels.
 
 + Apply Grad-CAM
-  + It try to apply Grad-CAM, but it don't make yet.
   + It is being appied by refering to "https://github.com/jacobgil/pytorch-grad-cam.git"
+
++ How to use
+  + Install packages about 'requirment.txt'
+  + In 'main.py', set the data path.
+  + In shell, execute 'main.py'
