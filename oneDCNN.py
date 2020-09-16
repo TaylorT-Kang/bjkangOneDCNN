@@ -5,6 +5,7 @@ import numpy as np
 import torch.optim as optim
 import matplotlib.pyplot as plt
 import time
+import os
 
 class bjkangNet(nn.Module):
 
@@ -22,7 +23,6 @@ class bjkangNet(nn.Module):
         super(bjkangNet,self).__init__()
         self.input_channels = input_channels
         self.conv1 = nn.Conv1d(1, 32, 3 , stride = 1)
-        
         self.conv2 = nn.Conv1d(32, 32, 3, stride = 1)
         self.conv3 = nn.Conv1d(32, 32, 3, stride = 1)
 
@@ -46,7 +46,7 @@ class bjkangNet(nn.Module):
         x = self.fc2(x)
         return x
 
-def train(model, train_loader, optimizer, epoch,iterator):
+def train(model, train_loader, optimizer, epoch,iterator, DEVICE):
     model.train()
 
     for batch_idx, (data, target) in enumerate(train_loader):
@@ -98,7 +98,7 @@ if __name__=='__main__':
     batch_size = 100
     test_sample = 0.7
     learning_rate = 0.001
-    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
+    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat', batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
     print(model)
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
@@ -113,7 +113,38 @@ if __name__=='__main__':
         print('[{}] Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(
             epoch, test_loss, test_accuracy))
 
-
-
+    # now = time.localtime()
+    # date = str(now.tm_year) + '_ ' + str(now.tm_mon) + '_ ' + str(now.tm_mday) + '_ ' + str(now.tm_hour) + '_ ' + str(now.tm_min) + '_ ' + str(now.tm_sec)
+    # path_folder = './Result/' + date
+    # os.makedirs(path_folder)
     PATH = './bjkangNet.pth'
     torch.save(model.state_dict(), PATH)
+
+
+def excute(folder_path, data_path, gt_path, EPOCHS, batch_size, test_sample, minmax_scale = 0):
+    DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
+    print(DEVICE)
+
+    import load_mat_data
+
+    learning_rate = 0.001
+    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat(data_path, gt_path, batch_size, test_sample)
+
+    model = bjkangNet(input_channels,n_classes).to(DEVICE)    
+    print(model)
+    optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
+    iterator = 0
+
+    for epoch in range(1, EPOCHS + 1):
+        iterator = train(model, train_loader, optimizer, epoch, iterator, DEVICE)
+        test_loss, test_accuracy = evaluate(model, test_loader,epoch,DEVICE)
+        if epoch == 90 : 
+            break_point = 0
+        
+        print('[{}] Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(
+            epoch, test_loss, test_accuracy))
+
+
+    PATH = folder_path +'/bjkangNet.pth'
+    torch.save(model.state_dict(), PATH)
+    return

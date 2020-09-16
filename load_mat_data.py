@@ -7,6 +7,11 @@ from sklearn.model_selection import train_test_split
 from torch.utils.data import DataLoader
 from torch.utils.data import Dataset, TensorDataset
 import hyperNomalize
+import cv2
+
+from scipy.ndimage.filters import convolve as convolve_sci
+from sklearn import preprocessing
+
 class CustomDataset(Dataset):
     def __init__(self, x_tensor, y_tensor):
         self.x = x_tensor
@@ -21,7 +26,7 @@ class CustomDataset(Dataset):
         return len(self.x)
 
 
-def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
+def load_mat(path, gt_path, b_size=16, test_sample = 0.7):
     mat_file = io.loadmat(path)
     key_list = list(mat_file.keys())
     HSI_data = mat_file[key_list[3]]
@@ -29,6 +34,7 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     key_list = list(mat_file.keys())
     HSI_gt = mat_file[key_list[3]]
     HSI_data = np.array(HSI_data, dtype=np.float)
+
     HSI_data = hyperNomalize.hyperNormalize(HSI_data)
 
     h, w, input_channels = HSI_data.shape
@@ -36,25 +42,20 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     hsi_data = []
     target = []
     k = 0
-    # for i in range(h):
-    #     for j in range(w):
-    #         if HSI_gt[i,j] != 0:
-    #             if HSI_gt[i,j] not in hsi_data:
-    #                 hsi_data[HSI_gt[i,j]] = []
-    #             hsi_data_i = np.expand_dims(HSI_data[i,j,:],axis=0)
-    #             hsi_data[HSI_gt[i,j]].append(hsi_data_i)
-    #             target.append(HSI_gt[i,j])
 
     for i in range(h):
         for j in range(w):
             if HSI_gt[i,j] != 0:
+                # if HSI_gt[i,j] == 4:
+                #     continue
                 hsi_data_i = np.expand_dims(HSI_data[i,j,:],axis=0)
                 hsi_data.append(hsi_data_i)
                 target.append(HSI_gt[i,j])
-    # for key in hsi_data:
-
-    # X = np.array(hsi_data, dtype=np.float)
-    # y = np.array(target, dtype=np.int64)
+                if HSI_gt[i,j] == 4:
+                    for k in range(30):
+                        hsi_data_i = np.expand_dims(HSI_data[i,j,:],axis=0)
+                        hsi_data.append(hsi_data_i)
+                        target.append(HSI_gt[i,j])
 
     X = torch.from_numpy(np.array(hsi_data,dtype=np.float)).float()
     y = torch.from_numpy(np.array(target,dtype=np.long)).long()
@@ -65,4 +66,4 @@ def load_mat(path, gt_path,b_size=16,test_sample = 0.3):
     train_loader = DataLoader(dataset=train_dataset, batch_size=b_size, shuffle=True)
     test_loader = DataLoader(dataset=test_dataset, batch_size=b_size, shuffle=True)
 
-    return HSI_data, HSI_gt, input_channels, n_classes + 1 , train_loader, test_loader, 
+    return HSI_data, HSI_gt, input_channels, n_classes + 1 , train_loader, test_loader
