@@ -9,8 +9,7 @@ import matplotlib.pyplot as plt
 
 if __name__=='__main__':
 
-    PATH = './bjkangNet_add.pth' #2020_ 9_ 11_ 16_ 49_ 13
-    PATH = './Result/2020_ 9_ 11_ 16_ 49_ 13/bjkangNet_add.pth'
+    PATH = './bjkangNet.pth'
     batch_size = 1
     test_sample = 0.3
     hyperCube, hyperGt, input_channels, n_classes, _, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
@@ -69,7 +68,7 @@ if __name__=='__main__':
 
 
 def excute(folder_path, data_path ,gt_path):
-    PATH = '/bjkangNet_add.pth'
+    PATH = '/bjkangNet.pth'
     batch_size = 1
     test_sample = 0.3
     hyperCube, hyperGt, input_channels, n_classes, _, test_loader = load_mat_data.load_mat(data_path ,gt_path, batch_size, test_sample)
