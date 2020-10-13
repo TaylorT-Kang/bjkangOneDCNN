@@ -98,7 +98,7 @@ if __name__=='__main__':
     batch_size = 100
     test_sample = 0.7
     learning_rate = 0.001
-    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat', batch_size, test_sample)
+    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat('./ADD_data/PaintsSameLabel/hyper3D_MWIR.mat', './ADD_data/PaintsSameLabel/hyper3D_MWIR_GT.mat',batch_size, test_sample)
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
     print(model)
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
@@ -121,15 +121,11 @@ if __name__=='__main__':
     torch.save(model.state_dict(), PATH)
 
 
-def excute(folder_path, data_path, gt_path, EPOCHS, batch_size, test_sample, minmax_scale = 0):
+def excute(folder_path, EPOCHS, batch_size, test_sample, input_channels, n_classes, train_loader, test_loader):
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(DEVICE)
 
-    import load_mat_data
-
     learning_rate = 0.001
-    _, _, input_channels, n_classes, train_loader, test_loader = load_mat_data.load_mat(data_path, gt_path, batch_size, test_sample)
-
     model = bjkangNet(input_channels,n_classes).to(DEVICE)    
     print(model)
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
@@ -147,4 +143,4 @@ def excute(folder_path, data_path, gt_path, EPOCHS, batch_size, test_sample, min
 
     PATH = folder_path +'/bjkangNet.pth'
     torch.save(model.state_dict(), PATH)
-    return
+    return model.state_dict()

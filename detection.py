@@ -9,10 +9,11 @@ import matplotlib.pyplot as plt
 
 if __name__=='__main__':
 
-    PATH = './bjkangNet.pth'
+    # PATH = './bjkangNet_add.pth' #2020_ 9_ 11_ 16_ 49_ 13
+    PATH = './Result/2020_ 9_ 24_ 23_ 16_ 46/bjkangNet_add.pth'
     batch_size = 1
     test_sample = 0.3
-    hyperCube, hyperGt, input_channels, n_classes, _, test_loader = load_mat_data.load_mat('./Datasets/PaviaU/PaviaU.mat', './Datasets/PaviaU/PaviaU_gt.mat',batch_size, test_sample)
+    hyperCube, hyperGt, input_channels, n_classes, _, test_loader = load_mat_data.load_mat('./ADD_data/1stData_paintSeperate/hyper3D_MWIR.mat', './ADD_data/1stData_paintSeperate/hyper3D_MWIR_GT.mat',batch_size, test_sample)
 
 
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
@@ -52,34 +53,28 @@ if __name__=='__main__':
 
     fig = plt.figure(1,figsize=(13,4))
     ax = fig.add_subplot(1,3,1)
-    im = ax.imshow(hyperGt,aspect='auto',cmap='jet',vmin=0,vmax=4)
+    im = ax.imshow(hyperGt,aspect='auto',cmap='jet',vmin=0,vmax=7)
     fig.colorbar(im)
     ax.set_xlabel('Ground Truth')
     ax = fig.add_subplot(1,3,2)
-    im = ax.imshow(predic_map_include_zeroLabel, aspect='auto',cmap='jet',vmin=0,vmax=4)
+    im = ax.imshow(predic_map_include_zeroLabel, aspect='auto',cmap='jet',vmin=0,vmax=7)
     fig.colorbar(im)
     ax.set_xlabel('predict with zero label')
     ax = fig.add_subplot(1,3,3)
-    im = ax.imshow(predic_map, aspect='auto',cmap='jet',vmin=0,vmax=4)
+    im = ax.imshow(predic_map, aspect='auto',cmap='jet',vmin=0,vmax=7)
     fig.colorbar(im)
     ax.set_xlabel('predict without zero label')
     plt.close(fig)
-    fig.savefig('dection.png',dpi=700)
+    fig.savefig('./dection.png',dpi=300)
 
 
-def excute(folder_path, data_path ,gt_path):
-    PATH = '/bjkangNet.pth'
-    batch_size = 1
-    test_sample = 0.3
-    hyperCube, hyperGt, input_channels, n_classes, _, test_loader = load_mat_data.load_mat(data_path ,gt_path, batch_size, test_sample)
-
+def excute(folder_path, hyperCube, hyperGt,input_channels, n_classes, test_loader, model_dict):
 
     DEVICE = torch.device("cuda:0" if torch.cuda.is_available() else "cpu")
     print(DEVICE)
 
     model = oneDCNN.bjkangNet(input_channels,n_classes)
-    w_path = folder_path + PATH
-    model.load_state_dict(torch.load(w_path))
+    model.load_state_dict(model_dict)
     print(model)
 
     model.to(DEVICE)
@@ -112,11 +107,11 @@ def excute(folder_path, data_path ,gt_path):
 
     fig = plt.figure(1,figsize=(13,4))
     ax = fig.add_subplot(1,3,1)
-    im = ax.imshow(hyperGt,aspect='auto',cmap='jet',vmin=0,vmax=4)
+    im = ax.imshow(hyperGt,aspect='auto',cmap='jet',vmin=0,vmax=7)
     fig.colorbar(im)
     ax.set_xlabel('Ground Truth')
     ax = fig.add_subplot(1,3,2)
-    im = ax.imshow(predic_map_include_zeroLabel, aspect='auto',cmap='jet',vmin=0,vmax=4)
+    im = ax.imshow(predic_map_include_zeroLabel, aspect='auto',cmap='jet',vmin=0,vmax=7)
     fig.colorbar(im)
     ax.set_xlabel('predict with zero label')
     ax = fig.add_subplot(1,3,3)
@@ -125,6 +120,6 @@ def excute(folder_path, data_path ,gt_path):
     ax.set_xlabel('predict without zero label')
     # plt.show()
     PATH = folder_path + '/dection.png'
-    fig.savefig(PATH,dpi=700)
+    fig.savefig(PATH,dpi=300)
     plt.close(fig)
     return
