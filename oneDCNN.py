@@ -117,7 +117,7 @@ if __name__=='__main__':
     # date = str(now.tm_year) + '_ ' + str(now.tm_mon) + '_ ' + str(now.tm_mday) + '_ ' + str(now.tm_hour) + '_ ' + str(now.tm_min) + '_ ' + str(now.tm_sec)
     # path_folder = './Result/' + date
     # os.makedirs(path_folder)
-    PATH = './bjkangNet.pth'
+    PATH = './bjkangNet_add.pth'
     torch.save(model.state_dict(), PATH)
 
 
@@ -130,6 +130,9 @@ def excute(folder_path, EPOCHS, batch_size, test_sample, input_channels, n_class
     print(model)
     optimizer = optim.SGD(model.parameters(), lr=learning_rate, momentum=0.9)
     iterator = 0
+    epoch_list = []
+    loss_list = []
+    accuracy_list = []
 
     for epoch in range(1, EPOCHS + 1):
         iterator = train(model, train_loader, optimizer, epoch, iterator, DEVICE)
@@ -137,10 +140,42 @@ def excute(folder_path, EPOCHS, batch_size, test_sample, input_channels, n_class
         if epoch == 90 : 
             break_point = 0
         
+        
+        epoch_list.append(epoch)
         print('[{}] Test Loss: {:.4f}, Accuracy: {:.2f}%'.format(
             epoch, test_loss, test_accuracy))
+        loss_list.append(test_loss)
+        accuracy_list.append(test_accuracy)
 
+        fig1 = plt.figure(1)
+        plt.plot(epoch_list,loss_list)
+        plt.xlabel('epoch')
+        plt.ylabel('loss')
+        plt.draw()
+        plt.pause(0.2)
+        if epoch is not EPOCHS:
+            fig1.clear()
+        
 
-    PATH = folder_path +'/bjkangNet.pth'
+        fig2 = plt.figure(2)
+        plt.plot(epoch_list,accuracy_list)
+        plt.xlabel('epoch')
+        plt.ylabel('accuracy')
+        plt.draw()
+        plt.pause(0.2)
+        if epoch is not EPOCHS:
+            fig2.clear()
+
+    PATH = folder_path +'/bjkangNet_add.pth'
     torch.save(model.state_dict(), PATH)
+
+
+    fig1_loss_path = folder_path + '/loss.png'
+    fig1.savefig(fig1_loss_path,dpi=fig1.dpi)
+    plt.close(fig1)
+
+    fig2_loss_path = folder_path + '/accuracy.png'
+    fig2.savefig(fig2_loss_path)
+    plt.close(fig2)
+
     return model.state_dict()
